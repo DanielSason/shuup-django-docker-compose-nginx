@@ -1,0 +1,35 @@
+version: '3'
+
+networks:
+  server_net:
+    driver: bridge 
+
+services:
+  app_server:
+    container_name: uwsgi_run
+    image: shuup          # Image which containes instructions to setup shuup with uwsgi protocol (HTTP [NO SEC])
+    networks:
+      - server_net
+
+  web_server1:
+    container_name: https_run
+    build: 
+      context: ./NGINX_HTTPS/   # After the image was built once - "docker-compose build" will built it agains
+      args:
+        port_arg : "8443"
+        host_arg : "0.0.0.0"    
+        cont_arg : "uwsgi_run"  # Named after app_server-> container_name(uwsgi_run)
+    networks:
+      - server_net
+    ports:
+      - "192.168.186.128:8443:8443"  # Specific address of executing machine needs to be UPDATED
+    expose:
+      - "8443"
+    depends_on: 
+      - app_server
+
+
+
+  
+
+  
